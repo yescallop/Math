@@ -18,10 +18,7 @@ public class Rational implements Number {
             numerator = denominator = BigInteger.ONE;
         } else {
             BigInteger gcd = numerator.gcd(denominator);
-            if (gcd.equals(BigInteger.ONE)) {
-                numerator = numerator;
-                denominator = denominator;
-            } else {
+            if (!gcd.equals(BigInteger.ONE)) {
                 numerator = numerator.divide(gcd);
                 denominator = denominator.divide(gcd);
             }
@@ -51,6 +48,7 @@ public class Rational implements Number {
     }
 
     public static Rational of(String val) {
+        //TODO
         return of(new BigDecimal(val));
     }
 
