@@ -9,4 +9,6 @@ public interface Number {
     Number multiply(Number val);
 
     Number divide(Number val);
+
+    Number pow(int exp);
 }
