@@ -3,7 +3,7 @@ package cn.yescallop.math.number;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public final class Rational implements Number, Comparable<Rational> {
+public final class Rational extends Number implements Comparable<Rational> {
 
     public static final Rational ZERO = new Rational(BigInteger.ZERO, BigInteger.ONE);
     public static final Rational ONE = new Rational(BigInteger.ONE, BigInteger.ONE);
@@ -17,10 +17,10 @@ public final class Rational implements Number, Comparable<Rational> {
     }
 
     public static Rational of(BigInteger numerator, BigInteger denominator) {
-        if (denominator.equals(BigInteger.ZERO))
+        if (denominator.signum() == 0)
             throw new ArithmeticException("zero denominator");
 
-        if (numerator.equals(BigInteger.ZERO))
+        if (numerator.signum() == 0)
             return ZERO;
 
         if (numerator.equals(denominator))
@@ -72,10 +72,14 @@ public final class Rational implements Number, Comparable<Rational> {
     public Number add(Number val) {
         if (!(val instanceof Rational))
             return val.add(this);
+
+        if (((Rational) val).signum() == 0)
+            return this;
+
         BigInteger gcd = denominator.gcd(((Rational) val).denominator);
         return of(
-                numerator.multiply(((Rational) val).denominator.divide(gcd)).add(
-                        ((Rational) val).numerator.multiply(denominator.divide(gcd))),
+                numerator.multiply(((Rational) val).denominator.divide(gcd))
+                        .add(((Rational) val).numerator.multiply(denominator.divide(gcd))),
                 denominator.multiply(((Rational) val).denominator)
                         .divide(gcd)
         );
@@ -85,10 +89,17 @@ public final class Rational implements Number, Comparable<Rational> {
     public Number subtract(Number val) {
         if (!(val instanceof Rational))
             return val.subtract(this);
+
+        if (((Rational) val).signum() == 0)
+            return this;
+
+        if (signum() == 0)
+            return ((Rational) val).negate();
+
         BigInteger gcd = denominator.gcd(((Rational) val).denominator);
         return of(
-                numerator.multiply(((Rational) val).denominator.divide(gcd)).subtract(
-                        ((Rational) val).numerator.multiply(denominator.divide(gcd))),
+                numerator.multiply(((Rational) val).denominator.divide(gcd))
+                        .subtract(((Rational) val).numerator.multiply(denominator.divide(gcd))),
                 denominator.multiply(((Rational) val).denominator)
                         .divide(gcd)
         );
@@ -98,6 +109,10 @@ public final class Rational implements Number, Comparable<Rational> {
     public Number multiply(Number val) {
         if (!(val instanceof Rational))
             return val.multiply(this);
+
+        if (signum() == 0 || ((Rational) val).signum() == 0)
+            return ZERO;
+
         return of(
                 numerator.multiply(((Rational) val).numerator),
                 denominator.multiply(((Rational) val).denominator)
@@ -108,6 +123,13 @@ public final class Rational implements Number, Comparable<Rational> {
     public Number divide(Number val) {
         if (!(val instanceof Rational))
             return val.divide(this);
+
+        if (((Rational) val).signum() == 0)
+            throw new ArithmeticException("Division by zero");
+
+        if (this.signum() == 0)
+            return ZERO;
+
         return of(
                 numerator.multiply(((Rational) val).denominator),
                 denominator.multiply(((Rational) val).numerator)
@@ -133,6 +155,20 @@ public final class Rational implements Number, Comparable<Rational> {
 
     public int signum() {
         return numerator.signum();
+    }
+
+    public Rational negate() {
+        return new Rational(numerator.negate(), denominator);
+    }
+
+    public Rational abs() {
+        return signum() < 0 ? new Rational(numerator.negate(), denominator) : this;
+    }
+
+    public Rational reverse() {
+        if (signum() == 0)
+            return ZERO;
+        return new Rational(signum() > 0 ? denominator : denominator.negate(), numerator.abs());
     }
 
     @Override

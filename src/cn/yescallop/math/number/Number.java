@@ -1,14 +1,23 @@
 package cn.yescallop.math.number;
 
-public interface Number {
+public abstract class Number implements Cloneable {
 
-    Number add(Number val);
+    public abstract Number add(Number val);
 
-    Number subtract(Number val);
+    public abstract Number subtract(Number val);
 
-    Number multiply(Number val);
+    public abstract Number multiply(Number val);
 
-    Number divide(Number val);
+    public abstract Number divide(Number val);
 
-    Number pow(int exp);
+    public abstract Number pow(int exp);
+
+    @Override
+    public Number clone() {
+        try {
+            return (Number) super.clone();
+        } catch (CloneNotSupportedException e){
+            return null;
+        }
+    }
 }
